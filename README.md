@@ -1,46 +1,73 @@
-# Getting Started with Create React App
+# React Raspberry Pi Starter Project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project serves as a boilerplate for future projects that aim to run React applications on a Raspberry Pi using Docker. The setup provides a streamlined process for building a Docker image on a development machine, transferring the image to a Raspberry Pi, and running the application within a Docker container on the Raspberry Pi.
 
-## Available Scripts
+## Setup
 
-In the project directory, you can run:
+### Raspberry Pi
 
-### `yarn start`
+Ensure you have the latest version of Raspberry Pi OS installed on your Raspberry Pi. This project assumes that you have Docker installed on your Raspberry Pi. If not, you can install it by running the following commands:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+\`\`\`bash
+sudo apt update
+sudo apt upgrade
+curl -sSL https://get.docker.com | sh
+sudo usermod -aG docker pi
+\`\`\`
+After installing Docker, restart your Raspberry Pi.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+You should also set a static IP address for your Raspberry Pi to avoid IP conflicts. This can be done by editing the `dhcpcd.conf` file:
 
-### `yarn test`
+\`\`\`bash
+sudo nano /etc/dhcpcd.conf
+\`\`\`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+In the opened file, add or uncomment and edit the following lines to set your desired static IP:
 
-### `yarn build`
+\`\`\`bash
+interface eth0
+static ip_address=192.168.1.XX/24
+static routers=192.168.1.1
+static domain_name_servers=192.168.1.1
+\`\`\`
+Replace `XX` with your desired IP address. Save the file and exit. You may need to restart the Raspberry Pi for changes to take effect.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Build, Save and Transfer the Docker Image
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+With the provided scripts in the `package.json` file, you can build a Docker image, save it to a `.tar` file, and transfer it to your Raspberry Pi over SSH.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+First, ensure you've built the Docker image:
 
-### `yarn eject`
+\`\`\`bash
+yarn docker:build
+\`\`\`
+This will build the Docker image using the Dockerfile in your project. The image will be tagged as `your-docker-username/your-image-name:version-tag`.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+The command `yarn docker:deploy` already includes the build and save steps. It will:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Build the Docker image for the Raspberry Pi's ARMv7 architecture.
+2. Save the Docker image as a `.tar` file in the `./docker-tars` directory of your project.
+3. Transfer the `.tar` file to your Raspberry Pi using `scp`.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+To deploy the Docker image to your Raspberry Pi:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+\`\`\`bash
+yarn docker:deploy
+\`\`\`
+This will use `scp` to transfer the `.tar` file over SSH to your Raspberry Pi. Be sure to replace the `username@raspberrypi-ip:/path/to/destination` placeholder with your Raspberry Pi's actual IP address and destination path.
 
-## Learn More
+### Running the Docker Container on Raspberry Pi
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Once the Docker image is on your Raspberry Pi, you can load the image into Docker and run the container.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Load the Docker image:
+
+\`\`\`bash
+docker load -i /path/to/your-image-name.tar
+\`\`\`
+Run the Docker container:
+
+\`\`\`bash
+docker run -p 3000:80 -d --name your-container-name your-docker-username/your-image-name:version-tag
+\`\`\`
+The application should now be running in a Docker container on your Raspberry Pi, accessible at `http://<your-pi-ip>:3000`.

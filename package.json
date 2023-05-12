@@ -16,12 +16,25 @@
     "typescript": "^4.4.2",
     "web-vitals": "^2.1.0"
   },
+
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+    "eject": "react-scripts eject",
+    "docker:build": "docker buildx build --platform linux/arm/v7 -t your-docker-username/your-image-name:version-tag . --load",
+    "docker:run": "docker run -p 3000:80 -d --name your-container-name your-docker-username/your-image-name:version-tag",
+    "docker:stop": "docker stop your-container-name || true",
+    "docker:remove": "docker rm your-container-name || true",
+    "docker:cleanup": "docker system prune -f",
+    "docker:save": "docker save -o ./docker-tars/your-image-name.tar your-docker-username/your-image-name:version-tag",
+    "docker:load": "docker load -i ./docker-tars/your-image-name.tar",
+    "docker:deploy": "npm run docker:build && npm run docker:save && scp ./docker-tars/your-image-name.tar username@raspberrypi-ip:/path/to/destination",
+    "docker:redeploy": "npm run docker:stop && npm run docker:remove && npm run docker:build && npm run docker:run",
+    "test:docker": "docker run --rm your-docker-username/your-image-name:version-tag npm test",
+    "docker:remove:all": "docker rmi $(docker images -a -q)"
+},
+
   "eslintConfig": {
     "extends": [
       "react-app",
