@@ -71,3 +71,26 @@ Run the Docker container:
 docker run -p 3000:80 -d --name your-container-name your-docker-username/your-image-name:version-tag
 ```
 The application should now be running in a Docker container on your Raspberry Pi, accessible at `http://<your-pi-ip>:3000`.
+
+## Automating Container Deployment
+
+The `run_docker.sh` script is included in this project to streamline the process of stopping and removing old Docker containers and images, loading the new Docker image, and running the new Docker container on your Raspberry Pi.
+
+This script contains the following steps:
+
+1. It stops and removes the old container if it exists.
+2. It removes the old Docker image if it exists.
+3. It loads the new Docker image from the `pi-server.tar` file.
+4. It runs the new Docker container.
+
+To use this script, place it in the same directory where the `pi-server.tar` file is located on your Raspberry Pi. Before running the script for the first time, ensure that it has the appropriate permissions:
+
+```bash
+chmod +x ./run_docker.sh
+```
+
+Then, simply run the script:
+
+```bash
+./run_docker.sh
+```

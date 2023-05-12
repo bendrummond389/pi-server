@@ -32,7 +32,8 @@
     "docker:deploy": "npm run docker:build && npm run docker:save && scp ./docker-tars/your-image-name.tar username@raspberrypi-ip:/path/to/destination",
     "docker:redeploy": "npm run docker:stop && npm run docker:remove && npm run docker:build && npm run docker:run",
     "test:docker": "docker run --rm your-docker-username/your-image-name:version-tag npm test",
-    "docker:remove:all": "docker rmi $(docker images -a -q)"
+    "docker:remove:all": "docker rmi $(docker images -a -q)",
+    "scp:script": "scp ./run_docker.sh pi@raspberrypi-ip:/path/to/destination/run_docker.sh",
 },
 
   "eslintConfig": {
