@@ -8,28 +8,28 @@ This project serves as a boilerplate for future projects that aim to run React a
 
 Ensure you have the latest version of Raspberry Pi OS installed on your Raspberry Pi. This project assumes that you have Docker installed on your Raspberry Pi. If not, you can install it by running the following commands:
 
-\`\`\`bash
+```bash
 sudo apt update
 sudo apt upgrade
 curl -sSL https://get.docker.com | sh
 sudo usermod -aG docker pi
-\`\`\`
+```
 After installing Docker, restart your Raspberry Pi.
 
 You should also set a static IP address for your Raspberry Pi to avoid IP conflicts. This can be done by editing the `dhcpcd.conf` file:
 
-\`\`\`bash
+```bash
 sudo nano /etc/dhcpcd.conf
-\`\`\`
+```
 
 In the opened file, add or uncomment and edit the following lines to set your desired static IP:
 
-\`\`\`bash
+```bash
 interface eth0
 static ip_address=192.168.1.XX/24
 static routers=192.168.1.1
 static domain_name_servers=192.168.1.1
-\`\`\`
+```
 Replace `XX` with your desired IP address. Save the file and exit. You may need to restart the Raspberry Pi for changes to take effect.
 
 ### Build, Save and Transfer the Docker Image
@@ -38,9 +38,9 @@ With the provided scripts in the `package.json` file, you can build a Docker ima
 
 First, ensure you've built the Docker image:
 
-\`\`\`bash
+```bash
 yarn docker:build
-\`\`\`
+```
 This will build the Docker image using the Dockerfile in your project. The image will be tagged as `your-docker-username/your-image-name:version-tag`.
 
 The command `yarn docker:deploy` already includes the build and save steps. It will:
@@ -51,9 +51,9 @@ The command `yarn docker:deploy` already includes the build and save steps. It w
 
 To deploy the Docker image to your Raspberry Pi:
 
-\`\`\`bash
+```bash
 yarn docker:deploy
-\`\`\`
+```
 This will use `scp` to transfer the `.tar` file over SSH to your Raspberry Pi. Be sure to replace the `username@raspberrypi-ip:/path/to/destination` placeholder with your Raspberry Pi's actual IP address and destination path.
 
 ### Running the Docker Container on Raspberry Pi
@@ -62,12 +62,12 @@ Once the Docker image is on your Raspberry Pi, you can load the image into Docke
 
 Load the Docker image:
 
-\`\`\`bash
+```bash
 docker load -i /path/to/your-image-name.tar
-\`\`\`
+```
 Run the Docker container:
 
-\`\`\`bash
+```bash
 docker run -p 3000:80 -d --name your-container-name your-docker-username/your-image-name:version-tag
-\`\`\`
+```
 The application should now be running in a Docker container on your Raspberry Pi, accessible at `http://<your-pi-ip>:3000`.
